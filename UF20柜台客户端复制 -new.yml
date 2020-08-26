@@ -1,0 +1,104 @@
+flow:
+  - envs:
+      FLOW_WELCOME_MESSAGE: "hello.world"
+
+      ORI_IP_HsClient: 192.25.108.19:21
+      ORI_Path_HsClient: C/HUNDSUN/HsClient
+      
+      ORI_IP_UF20FBASE: 192.25.108.19:21
+      ORI_Path_UF20FBASE: C/UF20FBASE2.0
+
+      ORI_IP_HSPlugins: 192.25.108.19:21
+      ORI_Path_HSSecuTrans: C/HUNDSUN/HSSecuTrans
+      ORI_Path_HsOptTrans: C/HUNDSUN/HsOptTrans
+      ORI_Path_HsCbpTrans: C/HUNDSUN/HsCbpTrans
+      ORI_Path_hsexchtrans: C/HUNDSUN/hsexchtrans
+      ORI_Path_HSFrontTrans_new: C/HUNDSUN/HSFrontTrans_new
+
+      ORI_IP_HQserver: 192.25.108.19:21
+      ORI_Path_HsHQIssue: C/HUNDSUN/HsHQIssue
+      ORI_Path_HsProdHQ: C/HUNDSUN/HsProdHQ 
+
+      ORI_IP_hshqserver: 192.25.108.19:21
+      ORI_Path_hshqserver: C/HUNDSUN/hshqserver
+
+      ORI_IP_hq: 192.25.108.19:21
+      ORI_Path_hq: D/hq
+
+      DES_IP: 192.25.108.237
+      
+      FLOW_AGENT: windows-192.25.108.237(UF20)
+      LOCAL_DL: D
+    steps:
+      - name: ProcessShutdown
+        script: |
+          rem shutdown process...
+          taskkill /f /im HSRCP.exe
+          rem ----localpath-----------
+          echo %LOCAL_DL%:\Hundsun\
+      - name: HsClientDownload
+        script: |
+          set Path=C:\Program Files\wget\ 
+          rem "starting"
+          rem ================================================================
+          rem
+          rem       本阶段复制HsClientDownload文件
+          rem           文件路径：HUNDSUN/HsClient/
+          rem 
+          rem ================================================================
+          wget -nH -r  -nv  -np --cut-dirs=2 ftp://%ORI_IP_HsClient%/%ORI_Path_HsClient%/* --ftp-user=ftpuser --ftp-password=ftpuser -P %LOCAL_DL%:\Hundsun\
+          rem 复制完成！
+      - name: HsHQIssueDownload
+        script: |
+          @echo off
+          rem "starting"
+          chcp
+          rem ================================================================
+          rem 
+          rem       本阶段复制HsHQIssue文件
+          rem           文件路径：/HUNDSUN/HsHQIssue/
+          rem 
+          rem ================================================================
+          wget -nH -r  -nv  -np --cut-dirs=2 ftp://192.25.108.19:21/%ORI_Path_HsHQIssue%/* --ftp-user=ftpuser --ftp-password=ftpuser -P %LOCAL_DL%:\Hundsun\
+          rem 复制完成！
+      - name: HsProdHQDownload
+        script: |
+          @echo off
+          echo "starting"
+          chcp
+          rem ================================================================
+          rem 
+          rem       本阶段复制HsProdHQ文件
+          rem           文件路径：/HUNDSUN/HsProdHQ/
+          rem 
+          rem ================================================================
+          wget -nH -r  -nv  -np --cut-dirs=2 ftp://192.25.108.19:21/%ORI_Path_HsProdHQ%/* --ftp-user=ftpuser --ftp-password=ftpuser -P %LOCAL_DL%:\Hundsun\   
+          rem 复制完成！      
+      - name: hshqserverDownload
+        script: |
+          @echo off
+          echo "starting"
+          chcp
+          rem ================================================================
+          rem 
+          rem       本阶段复制hshqserver文件
+          rem           文件路径：/HUNDSUN/hshqserver/
+          rem 
+          rem ================================================================
+          rem 复制完成！      
+          wget -nH -r  -nv  -np --cut-dirs=2 ftp://%ORI_IP_hshqserver%/%ORI_Path_hshqserver%/* --ftp-user=ftpuser --ftp-password=ftpuser -P %LOCAL_DL%:\Hundsun\   
+      - name: ProcessStartup
+        script: |
+          rem startup process...
+          start %LOCAL_DL%:\Hundsun\HsClient\HSRCP.exe
+          rem ----localpath-----------
+          echo %LOCAL_DL%:\Hundsun\
+          Exit
+      - name: ProcessCheck
+        script: |
+          rem =================================
+          rem
+          rem       process check
+          rem 
+          rem =================================
+          C:\h3c_file\Client_check.bat

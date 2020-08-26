@@ -1,0 +1,29 @@
+flow:
+  - envs:
+      FLOW_WELCOME_MESSAGE: "hello.world"
+      DES_IP: 192.25.108.237
+      ORI_IP: 192.25.108.19
+      FLOW_AGENT: windows-192.25.108.237(UF20)
+      LOCAL_DL: D
+    steps:
+      - name: ProcessShutdown
+        script: |
+          rem shutdown process...
+          taskkill /f /im HSRCP.exe
+          rem ----localpath-----------
+          echo %LOCAL_DL%:\Hundsun\
+      - name: ProcessStartup
+        script: |
+          rem startup process...
+          start %LOCAL_DL%:\Hundsun\HsClient\HSRCP.exe
+          rem ----localpath-----------
+          echo %LOCAL_DL%:\Hundsun\
+          Exit
+      - name: ProcessCheck
+        script: |
+          rem =================================
+          rem
+          rem       process check
+          rem 
+          rem =================================
+          C:\h3c_file\Client_check.bat

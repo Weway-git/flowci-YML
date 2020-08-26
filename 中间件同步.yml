@@ -1,0 +1,167 @@
+flow:
+  - envs:
+        FLOW_WELCOME_MESSAGE: hello.world
+        DES_LS_IP: 192.25.108.235
+        ORI_AS_IP: 192.25.105.14
+        DES_DB_IP: 192.25.108.236
+        DES_AS_IP: 192.25.108.234
+        ORI_LS_IP: 192.25.105.16
+        FLOW_AGENT: linux-192.25.106.220
+    steps:
+      - name: 停止目标环境AS
+        script: |
+          echo ---------------------------AS is stopping！-------------------------------          
+          ssh root@${DES_AS_IP} "su - hundsun -s /bin/bash /home/h3c_file/AS_stop.sh"
+          echo "AS is stopped"
+      - name: 停止目标环境LS
+        script: |
+          echo ---------------------------LS is stopping！-------------------------------          
+          ssh root@${DES_LS_IP} "su - hundsun -s /bin/bash /home/h3c_file/LS_stop.sh"
+          echo "LS is stopped"
+      - name: init-LS相关配置
+        script: |
+          echo ---------------------------LS正在复制-------------------------------
+      - name: LS-workspace-xml-cert-license下载
+        script: |
+          echo "正在下载xml"
+          scp -rp root@${ORI_LS_IP}:/home/hundsun/workspace/*.xml /h3c/ZJJ/LS/workspace
+          echo "xml finished"
+          echo "正在下载cert"
+          scp -rp root@${ORI_LS_IP}:/home/hundsun/workspace/cert /h3c/ZJJ/LS/workspace/
+          echo "正在下载license"
+          scp -rp root@${ORI_LS_IP}:/home/hundsun/workspace/license /h3c/ZJJ/LS/workspace/
+      - name: LS-workspace-runall-stopall下载
+        script: |
+          echo "正在下载runall文件"
+          scp -rp root@${ORI_LS_IP}:/home/hundsun/workspace/runall /h3c/ZJJ/LS/workspace/
+          echo "正在下载stopall文件"
+          scp -rp root@${ORI_LS_IP}:/home/hundsun/workspace/stopall /h3c/ZJJ/LS/workspace/
+          echo "finished!"
+      - name: LS-workspace-updatedir下载
+        script: |
+          echo "正在下载updatedir文件"
+          scp -rp root@${ORI_LS_IP}:/home/hundsun/workspace/updatedir /h3c/ZJJ/LS/workspace/
+          echo "finished！"
+      - name: LS-appcom下载
+        script: |
+          echo "正在下载appcom文件"
+          scp -rp root@${ORI_LS_IP}:/home/hundsun/appcom /h3c/ZJJ/LS/
+          echo "finished！"
+      - name: LS-linux.i386下载
+        script: |
+          echo "正在下载linux.i386文件"
+          scp -rp root@${ORI_LS_IP}:/home/hundsun/linux.i386 /h3c/ZJJ/LS/
+          echo "finished！"
+      - name: LS-修改配置-workspace
+        script: |
+          java -version
+          echo 正在修改...
+          java -jar /h3c/plugin/demo.jar --ip.as=${DES_AS_IP} --ip.ls=${DES_LS_IP} --ip.database=${DES_DB_IP} --file.location.workspace=/h3c/ZJJ/LS/workspace/
+          echo "清除nrs.xml"
+          rm -rf /h3c/ZJJ/LS/workspace/nrs.xml
+          ls nrs.xml
+      - name: LS-将配置上传到目标环境-appcom
+        script: |
+          echo 正在上传
+          scp -rp /h3c/ZJJ/LS/appcom root@${DES_LS_IP}:/home/hundsun/ 
+      - name: LS-将配置上传到目标环境-linux.i386
+        script: |
+          echo 正在上传
+          scp -rp /h3c/ZJJ/LS/linux.i386 root@${DES_LS_IP}:/home/hundsun/ 
+      - name: LS-将配置上传到目标环境-workspace
+        script: |
+          echo 正在上传
+          scp -rp /h3c/ZJJ/LS/workspace/ root@${DES_LS_IP}:/home/hundsun/
+      - name: init-AS相关配置
+        script: |
+          echo ---------------------------AS正在复制-------------------------------
+      - name: AS-workspace-xml-cert-license下载
+        script: |
+          echo "正在下载xml"
+          scp -rp root@${ORI_AS_IP}:/home/hundsun/workspace/*.xml /h3c/ZJJ/AS/workspace
+          echo "xml finished"
+          echo "正在下载cert"
+          scp -rp root@${ORI_AS_IP}:/home/hundsun/workspace/cert /h3c/ZJJ/AS/workspace/
+          echo "正在下载license"
+          scp -rp root@${ORI_AS_IP}:/home/hundsun/workspace/license /h3c/ZJJ/AS/workspace/
+      - name: AS-workspace-runall-stopall下载
+        script: |
+          echo "正在下载runall文件"
+          scp -rp root@${ORI_AS_IP}:/home/hundsun/workspace/runall /h3c/ZJJ/AS/workspace/
+          echo "正在下载stopall文件"
+          scp -rp root@${ORI_AS_IP}:/home/hundsun/workspace/stopall /h3c/ZJJ/AS/workspace/
+          echo "finished!"
+      - name: AS-workspace-updatedir下载
+        script: |
+          echo "正在下载updatedir文件"
+          scp -rp root@${ORI_AS_IP}:/home/hundsun/workspace/updatedir /h3c/ZJJ/AS/workspace/
+          echo "finished！"
+      - name: AS-appcom下载
+        script: |
+          echo "正在下载appcom文件"
+          scp -rp root@${ORI_AS_IP}:/home/hundsun/appcom /h3c/ZJJ/AS/
+          echo "finished！"
+      - name: AS-linux.i386下载
+        script: |
+          echo "正在下载linux.i386文件"
+          scp -rp root@${ORI_AS_IP}:/home/hundsun/linux.i386 /h3c/ZJJ/AS/
+          echo "finished！"
+      - name: AS-修改配置-workspace
+        script: |
+          java -version
+          echo 正在修改...
+          java -jar /h3c/plugin/demo.jar --ip.as=${DES_AS_IP} --ip.ls=${DES_LS_IP} --ip.database=${DES_DB_IP} --file.location.workspace=/h3c/ZJJ/AS/workspace/
+          echo "清除nrs.xml"
+          rm -rf /h3c/ZJJ/AS/workspace/nrs.xml
+          ls nrs.xml
+      - name: AS-将配置上传到目标环境-appcom
+        script: |
+          echo 正在上传
+          scp -rp /h3c/ZJJ/AS/appcom root@${DES_AS_IP}:/home/hundsun/ 
+      - name: AS-将配置上传到目标环境-linux.i386
+        script: |
+          echo 正在上传
+          scp -rp /h3c/ZJJ/AS/linux.i386 root@${DES_AS_IP}:/home/hundsun/ 
+      - name: AS-将配置上传到目标环境-workspace
+        script: |
+          echo 正在上传
+          scp -rp /h3c/ZJJ/AS/workspace/ root@${DES_AS_IP}:/home/hundsun/
+      - name: AS刷新文件权限
+        script: |
+          echo ================================================================
+          echo         本阶段刷新文件权限
+          echo         文件路径：/home/hundsun/
+          echo 
+          echo ================================================================
+          ssh root@${DES_AS_IP} "chown -R hundsun:oinstall /home/hundsun/workspace; ls -l /home/hundsun/workspace"
+          ssh root@${DES_AS_IP} "chown -R hundsun:oinstall /home/hundsun/appcom; ls -l /home/hundsun/appcom"
+          ssh root@${DES_AS_IP} "chown -R hundsun:oinstall /home/hundsun/linux.i386; ls -l /home/hundsun/linux.i386"
+      - name: LS刷新文件权限
+        script: |
+          echo ================================================================
+          echo         本阶段刷新文件权限
+          echo         文件路径：/home/hundsun/
+          echo 
+          echo ================================================================
+          ssh root@${DES_LS_IP} "chown -R hundsun:oinstall /home/hundsun/workspace; ls -l /home/hundsun/workspace"
+          ssh root@${DES_LS_IP} "chown -R hundsun:oinstall /home/hundsun/appcom; ls -l /home/hundsun/appcom"
+          ssh root@${DES_LS_IP} "chown -R hundsun:oinstall /home/hundsun/linux.i386; ls -l /home/hundsun/linux.i386"
+      - name: LS start
+        script: |
+          echo ---------------------------LS is starting！-------------------------------          
+          ssh root@${DES_LS_IP} "su - hundsun -s /bin/bash /home/h3c_file/LS_run.sh" & exit
+      - name: AS start
+        script: |
+          echo ---------------------------AS is starting！-------------------------------          
+          ssh root@${DES_AS_IP} "su - hundsun -s /bin/bash /home/h3c_file/AS_run.sh" & exit
+      - name: LS check
+        script: |
+          echo "please wait !"
+          sleep 180
+          echo ---------------------------LS is checking！-------------------------------          
+          ssh root@${DES_LS_IP} "su - hundsun -s /bin/bash /home/h3c_file/LS_check.sh"
+      - name: AS check
+        script: |
+          echo ---------------------------AS is checking！-------------------------------          
+          ssh root@${DES_AS_IP} "su - hundsun -s /bin/bash /home/h3c_file/AS_check.sh"
+
