@@ -1,0 +1,90 @@
+flow:
+    - envs:
+        FLOW_WELCOME_MESSAGE: hello.world
+        FLOW_GIT_URL: http://47.105.130.168:8181/devops/h3c_devops_ci_web.git
+        FLOW_PATH: /home/flow/
+        FlOW_APP_NAME: h3c_devops_ci_web
+        FLOW_CONFIGURATION: /home/flow/Configuration/
+        FLOW_NGINX_HTML_PATH: /usr/share/nginx/html
+        PROJECT_URL: 192.168.17.129
+      steps:
+       - name: Init
+         script: |
+           cat /home/flow/Configuration/h3c_devops_ci_web/index.html
+           echo ${FLOW_WELCOME_MESSAGE}
+           echo git address is ${FLOW_GIT_URL}
+           if [ -d ${FLOW_PATH} ];then
+             echo "FlowPath is existed"
+             echo FlowPath is ${FLOW_PATH}
+             cd ${FLOW_PATH}
+           else
+             echo "not exist"
+             mkdir -p ${FLOW_PATH}
+             cd ${FLOW_PATH}
+             echo "FlowPath is created!"
+             echo FlowPath is ${FLOW_PATH}
+             cd ${FLOW_PATH}
+           fi
+       - name: Init & Source code (Git)
+         script: |-
+           cd ${FLOW_PATH}
+           if [ -d ${FlOW_APP_NAME} ];then
+             echo "FlOW_APP_NAME is existed"
+             echo ${FlOW_APP_NAME}
+             echo ${FLOW_GIT_BRANCH}
+             cd ${FLOW_PATH}
+             cd ${FlOW_APP_NAME}
+             git checkout .
+             git fetch origin
+             git pull
+             git checkout ${FLOW_GIT_BRANCH}
+           else
+             echo "FLOW_LOCAL_PATH not exist"
+             git clone ${FLOW_GIT_URL}
+             cd ${FLOW_PATH}
+             cd ${FlOW_APP_NAME}
+             git checkout .
+             git checkout ${FLOW_GIT_BRANCH}
+             echo FlOW_APP_NAME is ${FlOW_APP_NAME}
+           fi
+       - name: ConfigurationDistribution
+         script: |-
+           cd ${FLOW_CONFIGURATION}
+           cd ${FlOW_APP_NAME}
+           cp -rf * ${FLOW_PATH}/${FlOW_APP_NAME}/src/
+           cd ${FLOW_PATH}/${FlOW_APP_NAME}/src/
+           cat index.html
+       - name: Cnpm Init
+         script: |-
+           echo "module initing..."
+           cd ${FLOW_PATH}
+           cd ${FlOW_APP_NAME}
+           cnpm install
+           echo "module init finished"
+           echo "Cnpm environment is OK"
+           # cnpm run clean
+       - name: Build Artifact
+         script: |-
+           cd ${FLOW_PATH}
+           cd ${FlOW_APP_NAME}
+           cnpm run build
+           ls ./dist
+       - name: DeployProject
+         allowFailure: false
+         script: |-
+           # rm -rf ${FLOW_NGINX_HTML_PATH}/*
+           echo ${FLOW_NGINX_HTML_PATH}
+           cd ${FLOW_PATH}
+           cd ${FlOW_APP_NAME}
+           cp -rf dist/* ${FLOW_NGINX_HTML_PATH}
+           echo "nginx reload...."
+           # 这里需要加个判断，判断nginx是否启动正常
+           # nginx -s stop
+           nginx -s reload
+           echo "nginx reload success"
+           cd ${FLOW_NGINX_HTML_PATH}
+           cat index.html
+       - name: Auto Test
+         isFinal: true
+         script: |-
+          curl -I ${PROJECT_URL}
