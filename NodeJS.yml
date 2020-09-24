@@ -1,6 +1,7 @@
 flow:
   - envs:
         FLOW_WELCOME_MESSAGE: hello.world
+        FLOW_AGENT: linux-agent1
         FLOW_GIT_URL: http://47.105.130.168:8181/devops/h3c_devops_ci_web.git
         FLOW_PATH: /home/flow/
         FlOW_APP_NAME: h3c_devops_ci_web
@@ -37,6 +38,7 @@ flow:
               git checkout .
               git pull
               git checkout ${FLOW_GIT_BRANCH}
+              git pull
             else
               echo "FLOW_LOCAL_PATH not exist"
               git clone ${FLOW_GIT_URL}
@@ -58,7 +60,8 @@ flow:
             echo "module initing..."
             cd ${FLOW_PATH}
             cd ${FlOW_APP_NAME}
-            cnpm install
+            npm config set registry https://registry.npm.taobao.org
+            npm install --unsafe-perm
             echo "module init finished"
             echo "Cnpm environment is OK"
             # cnpm run clean

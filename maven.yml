@@ -86,5 +86,5 @@ flow:
        - name: Auto Test
          isFinal: true
          script: |-
-              curl -I ${PROJECT_URL} 
+              curl -I ${PROJECT_URL}
               curl -X POST "http://${PROJECT_URL}:8080/flow-api/user/login" -H "accept: */*" -H "Content-Type: application/json" -d "{ \"emailOrUsername\": \"admin\", \"password\": \"123456\"}"
