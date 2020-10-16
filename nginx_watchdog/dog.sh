@@ -16,10 +16,17 @@ function start(){
         else
             # changed
             date=`date`
-            mail_content=`cat ${file_path}/${file_name} | awk 'END {print}'`
-            # echo mail_content  ${mail_content}
+            content=`cat ${file_path}/${file_name} | awk 'END {print}'`
+            ip=`echo ${content} | awk -F- '{print $1}'`
+            time=`echo ${content} | awk -F- '{print $2}'`
+            method=`echo ${content} | awk -F- '{print $3}'`
+            code=`echo ${content} | awk -F- '{print $4}'`
+            size=`echo ${content} | awk -F- '{print $5}'`
+            user_agent=`echo ${content} | awk -F- '{print $6}'`
+            
+            # echo content  ${content}
             echo "changed!!!!!!!!!!!!!!!!!!!!!!"
-            echo "${mail_content}" |mail -s "${date}" 1419864987@qq.com
+            echo "IP address is ${ip}\n UserAgent is ${user_agent}\n time is ${time}\n  check time is ${check_time}" |mail -s "${date}" 1419864987@qq.com
             sleep 10
         fi
     done
