@@ -26,7 +26,7 @@ function start(){
             
             # echo content  ${content}
             echo "changed!!!!!!!!!!!!!!!!!!!!!!"
-            echo "IP address is ${ip}\n UserAgent is ${user_agent}\n time is ${time}\n  check time is ${check_time}" |mail -s "${date}" 1419864987@qq.com
+            echo -e " IP address is ${ip}\n UserAgent is ${user_agent}\n Time is ${time}\n check time is ${check_time}" |mail -s "${date}" 1419864987@qq.com
             sleep 10
         fi
     done
