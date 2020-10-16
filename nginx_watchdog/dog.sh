@@ -34,9 +34,12 @@ function start(){
             dos2unix -k /root/watchdogs/temp.txt
             mail -s "${date}" 1419864987@qq.com < /root/watchdogs/temp.txt
             sleep 2
+            echo "mail sent successfully!"
         fi
     done
 }
 
 start
+
+
 
