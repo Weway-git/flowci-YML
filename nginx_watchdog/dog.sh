@@ -27,14 +27,14 @@ function start(){
 
             # ip to address
             ip_addr=`curl  'http://ip.zxinc.org/api.php?type=json&ip='$ip   -H 'Accept: */*' -H 'Referer: http://ip.zxinc.org/ipquery/' -H 'X-Requested-With: XMLHttpRequest' -H 'Proxy-Connection: keep-alive' --compressed`
-            location=`echo ${ip_addr} |jq '.data.location'`
+            # location=`echo ${ip_addr} |jq '.data.location'`
             range=`echo ${ip_addr} |jq '.data.ip'`
-            # country=`echo ${ip_addr} |jq '.data.country'`
-
-
+            country=`echo ${ip_addr} |jq '.data.country'`
+            type=`echo ${ip_addr} |jq '.data.local'`
+            
             # echo content  ${content}
             echo "changed!!!!!!!!!!!!!!!!!!!!!!"
-            echo -e "[location]: ${location}\n [range]: ${range}\n [IP address]: ${ip}\n [UserAgent]: ${user_agent}\n [Time]: ${time}\n [check time]: ${check_time}" >  /root/watchdogs/temp.txt
+            echo -e "[location]: ${country}\n [type]: ${type}\n [range]: ${range}\n [IP address]: ${ip}\n [UserAgent]: ${user_agent}\n [Time]: ${time}\n [check time]: ${check_time}" >  /root/watchdogs/temp.txt
             dos2unix -k /root/watchdogs/temp.txt
             mail -s "${date}" 1419864987@qq.com < /root/watchdogs/temp.txt
             sleep 1
