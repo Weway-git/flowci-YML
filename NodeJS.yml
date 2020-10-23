@@ -75,6 +75,21 @@ flow:
             cd dist
             tar -cvf webdist.tar *
             mv webdist.tar /home/flow/Publish
+      - name: DockerBuild
+        script: |-
+            cd /home/flow/h3c_devops_ci_web
+            docker build -t xingye-web:1.0.0 .
+            docker tag xingye-web:1.0.0  114.141.150.80:5000/weway/xingye:1.0.0
+            docker push 114.141.150.80:5000/weway/xingye:1.0.0
+
+            # 停止所有镜像
+            docker rmi $(docker images -f "dangling=true" -q)
+
+            # 清理none镜像
+            docker rmi $(docker images -f "dangling=true" -q)
+
+
+
       - name: DeployProject
         script: |-
             rm -rf ${FLOW_NGINX_HTML_PATH}/*
