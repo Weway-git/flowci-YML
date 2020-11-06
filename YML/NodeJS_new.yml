@@ -1,0 +1,111 @@
+flow:
+  - envs:
+        FLOW_WELCOME_MESSAGE: hello.world
+        FLOW_AGENT: linux-agent1
+        FLOW_GIT_URL: http://47.105.130.168:8181/devops/h3c_devops_ci_web.git
+        FLOW_PATH: /home/flow/
+        FlOW_APP_NAME: h3c_devops_ci_web
+        FLOW_CONFIGURATION: /home/flow/Configuration/
+        FLOW_NGINX_HTML_PATH: /usr/share/nginx/html
+        PROJECT_URL: 172.16.0.3
+    steps:
+      - name: Init
+        script: |-
+            cat /home/flow/Configuration/h3c_devops_ci_web/index.html
+            echo ${FLOW_WELCOME_MESSAGE}
+            echo git address is ${FLOW_GIT_URL}
+            if [ -d ${FLOW_PATH} ];then
+              echo "FlowPath is existed"
+              echo FlowPath is ${FLOW_PATH}
+              cd ${FLOW_PATH}
+            else
+              echo "not exist"
+              mkdir -p ${FLOW_PATH}
+              cd ${FLOW_PATH}
+              echo "FlowPath is created!"
+              echo FlowPath is ${FLOW_PATH}
+              cd ${FLOW_PATH}
+            fi
+      - name: InitSourceCodeGit
+        script: |-
+            cd ${FLOW_PATH}
+            if [ -d $FlOW_APP_NAME ];then
+              echo "FlOW_APP_NAME is existed"
+              echo ${FlOW_APP_NAME}
+              echo ${FLOW_GIT_BRANCH}
+              cd ${FLOW_PATH}
+              cd ${FlOW_APP_NAME}
+              git checkout .
+              git pull
+              git checkout ${FLOW_GIT_BRANCH}
+              git pull
+            else
+              echo "FLOW_LOCAL_PATH not exist"
+              git clone ${FLOW_GIT_URL}
+              cd ${FLOW_PATH}
+              cd ${FlOW_APP_NAME}
+              git checkout .
+              git checkout ${FLOW_GIT_BRANCH}
+              echo FlOW_APP_NAME is ${FlOW_APP_NAME}
+            fi
+      - name: ConfigurationDistribution
+        script: |-
+            cd ${FLOW_CONFIGURATION}
+            cd ${FlOW_APP_NAME}
+            cp -rf * ${FLOW_PATH}/${FlOW_APP_NAME}/src/
+            cd ${FLOW_PATH}/${FlOW_APP_NAME}/src/
+            cat index.html
+      - name: CnpmInit
+        script: |-
+            echo "module initing..."
+            cd ${FLOW_PATH}
+            cd ${FlOW_APP_NAME}
+            npm config set registry https://registry.npm.taobao.org
+            npm install --unsafe-perm
+            echo "module init finished"
+            echo "Cnpm environment is OK"
+            # cnpm run clean
+      - name: BuildArtifact
+        script: |-
+            cd ${FLOW_PATH}
+            cd ${FlOW_APP_NAME}
+            # 这里需要加判断，cnpm是否安装
+            cnpm run build
+            ls ./dist
+            cd dist
+            tar -cvf webdist.tar *
+            mv webdist.tar /home/flow/Publish
+      - name: DockerBuild
+        script: |-
+            cd /home/flow/h3c_devops_ci_web
+            docker build -t xingye-web:1.0.0 .
+            docker tag xingye-web:1.0.0  114.141.150.80:5000/weway/xingye:1.0.0
+            docker push 114.141.150.80:5000/weway/xingye:1.0.0
+
+            # 停止所有镜像
+            docker rmi $(docker images -f "dangling=true" -q)
+
+            # 清理none镜像
+            docker rmi $(docker images -f "dangling=true" -q)
+
+
+
+      - name: DeployProject
+        script: |-
+            rm -rf ${FLOW_NGINX_HTML_PATH}/*
+            echo ${FLOW_NGINX_HTML_PATH}
+            cd ${FLOW_PATH}
+            cd ${FlOW_APP_NAME}
+            cp -rf dist/* ${FLOW_NGINX_HTML_PATH}
+            echo "nginx reload...."
+            # 这里加判断 nginx是否启动
+            systemctl restart nginx
+            echo "nginx reload success"
+            cd ${FLOW_NGINX_HTML_PATH}
+            cat index.html
+      - name: Auto Test
+        isFinal: true
+        script: |
+              curl -I ${PROJECT_URL} 
+              curl -X POST "http://${PROJECT_URL}:8080/flow-api/user/login" -H "accept: */*" -H "Content-Type: application/json" -d "{ \"emailOrUsername\": \"admin\", \"password\": \"123456\"}"
+
