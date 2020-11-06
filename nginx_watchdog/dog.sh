@@ -1,3 +1,4 @@
+# need jq,  yum install jq
 function start(){
     local file_path=/usr/local/nginx/logs
     local file_name=access.log
@@ -17,6 +18,14 @@ function start(){
             export LANG=zh_CN.UTF-8
             date=`date`
             content=`cat ${file_path}/${file_name} | awk 'END {print}'`
+            # 过滤content为127.0.0.1的访问
+              echo ${content}|grep 127.0.0.1
+              if [ $? -eq 0 ]
+                then
+                   continue
+              fi
+
+            
             ip=`echo ${content} | awk -F '|'  '{print $1}'`
             time=`echo ${content} | awk -F '|'  '{print $3}'`
             method=`echo ${content} | awk -F '|'  '{print $4}'`
@@ -36,7 +45,7 @@ function start(){
             echo "changed!!!!!!!!!!!!!!!!!!!!!!"
             echo -e "[location]: ${country}\n [type]: ${type}\n [range]: ${range}\n [IP address]: ${ip}\n [UserAgent]: ${user_agent}\n [Time]: ${time}\n [check time]: ${check_time}" >  /root/watchdogs/temp.txt
             dos2unix -k /root/watchdogs/temp.txt
-            mail -s "${date}" 1419864987@qq.com < /root/watchdogs/temp.txt
+            mail -s "Fish got! ${date}" 1419864987@qq.com < /root/watchdogs/temp.txt
             sleep 1
             echo "mail sent successfully!"
         fi
