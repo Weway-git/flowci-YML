@@ -1,0 +1,20 @@
+# flow.ci templates
+
+flow:
+    - envs:
+        FLOW_WELCOME_MESSAGE: "hello.world"
+        FLOW_AGENT: linux-agent1
+      steps:
+        - name: Init
+          script: |
+            echo ${FLOW_WELCOME_MESSAGE}
+            ip addr
+            cd /home/flow/csm_axure_design
+            git pull
+        - name: Sync
+          script: |
+            cd /home/flow/csm_axure_design
+            rm -rf /usr/share/nginx/html/*
+            cp -rf * /usr/share/nginx/csm_axure_design/
+            nginx -s stop
+            nginx
