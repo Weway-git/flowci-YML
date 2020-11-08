@@ -78,15 +78,18 @@ flow:
       - name: DockerBuild
         script: |-
             cd /home/flow/h3c_devops_ci_web
-            docker build -t xingye-web:1.0.0 .
-            docker tag xingye-web:1.0.0  114.141.150.80:5000/weway/xingye:1.0.0
-            docker push 114.141.150.80:5000/weway/xingye:1.0.0
+            docker build -t 172.22.205.63:5000/weway/xingye-web:lastest .
+            # docker tag xingye-web:1.0.0  47.116.137.249:5000/weway/xingye:1.0.0
+            #  
+            docker push 172.22.205.63:5000/weway/xingye-web
+            # 停止docker容器
+            docker kill xingye_web
 
-            # 停止所有镜像
-            docker rmi $(docker images -f "dangling=true" -q)
 
             # 清理none镜像
-            docker rmi $(docker images -f "dangling=true" -q)
+            docker rmi -f $(docker images -f "dangling=true" -q)
+            # 启动镜像
+            # docker run -d  --name   xingye_web  -e FLOW_API_DOMAIN=47.116.137.249:8080 -p 81:80 172.22.205.63:5000/xingye-web
 
 
 
