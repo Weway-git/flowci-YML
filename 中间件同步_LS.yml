@@ -1,0 +1,88 @@
+flow:
+  - envs:
+        FLOW_WELCOME_MESSAGE: hello.world
+        FLOW_AGENT: linux-192.25.106.220
+    steps:
+      - name: 停止目标环境LS
+        script: |
+          echo ---------------------------LS is stopping！-------------------------------          
+          ssh root@${DES_ENV_LS} "su - hundsun -s /bin/bash /home/h3c_file/LS_stop.sh"
+          echo "LS is stopped"
+      - name: init-LS相关配置
+        script: |
+          echo ---------------------------LS正在复制-------------------------------
+      - name: LS-workspace-xml-cert-license下载
+        script: |
+          echo "正在下载xml"
+          scp -rp root@${ORI_ENV_LS}:/home/hundsun/workspace/*.xml /h3c/ZJJ/LS/workspace
+          echo "xml finished"
+          echo "正在下载cert"
+          scp -rp root@${ORI_ENV_LS}:/home/hundsun/workspace/cert /h3c/ZJJ/LS/workspace/
+          echo "正在下载license"
+          scp -rp root@${ORI_ENV_LS}:/home/hundsun/workspace/license /h3c/ZJJ/LS/workspace/
+      - name: LS-workspace-runall-stopall下载
+        script: |
+          echo "正在下载runall文件"
+          scp -rp root@${ORI_ENV_LS}:/home/hundsun/workspace/runall /h3c/ZJJ/LS/workspace/
+          echo "正在下载stopall文件"
+          scp -rp root@${ORI_ENV_LS}:/home/hundsun/workspace/stopall /h3c/ZJJ/LS/workspace/
+          echo "finished!"
+      - name: LS-workspace-updatedir下载
+        script: |
+          echo "正在下载updatedir文件"
+          scp -rp root@${ORI_ENV_LS}:/home/hundsun/workspace/updatedir /h3c/ZJJ/LS/workspace/
+          echo "finished！"
+      - name: LS-appcom下载
+        script: |
+          echo "正在下载appcom文件"
+          scp -rp root@${ORI_ENV_LS}:/home/hundsun/appcom /h3c/ZJJ/LS/
+          echo "finished！"
+      - name: LS-linux.i386下载
+        script: |
+          echo "正在下载linux.i386文件"
+          scp -rp root@${ORI_ENV_LS}:/home/hundsun/linux.i386 /h3c/ZJJ/LS/
+          echo "finished！"
+      - name: LS-修改配置-workspace
+        script: |
+          java -version
+          echo 正在修改...
+          # 用sed来替换nrs.xml的ip
+          # 临时修复
+          mv /h3c/ZJJ/LS/workspace/nrs.xml  /h3c/ZJJ/LS/workspace/nrs_backup.xml 
+          # java -jar /h3c/plugin/demo.jar --ip.as=${DES_ENV_AS} --ip.ls=${DES_ENV_LS} --ip.database=${DES_ENV_DB} --file.location.workspace=/h3c/ZJJ/LS/workspace/
+          mv   /h3c/ZJJ/LS/workspace/nrs_backup.xml /h3c/ZJJ/LS/workspace/nrs.xml
+          # 临时修复修改nrs.xml
+          cd /h3c/ZJJ/LS/workspace/
+          sed -i  "s/$ORI_ENV_LS/$DES_ENV_LS/g"  nrs.xml
+      - name: LS-将配置上传到目标环境-appcom
+        script: |
+          echo 正在上传
+          scp -rp /h3c/ZJJ/LS/appcom root@${DES_ENV_LS}:/home/hundsun/ 
+      - name: LS-将配置上传到目标环境-linux.i386
+        script: |
+          echo 正在上传
+          scp -rp /h3c/ZJJ/LS/linux.i386 root@${DES_ENV_LS}:/home/hundsun/ 
+      - name: LS-将配置上传到目标环境-workspace
+        script: |
+          echo 正在上传
+          scp -rp /h3c/ZJJ/LS/workspace/ root@${DES_ENV_LS}:/home/hundsun/
+      - name: LS刷新文件权限
+        script: |
+          echo ================================================================
+          echo         本阶段刷新文件权限z
+          echo         文件路径：/home/hundsun/
+          echo 
+          echo ================================================================
+          ssh root@${DES_ENV_LS} "chown -R hundsun:oinstall /home/hundsun/workspace; ls -l /home/hundsun/workspace"
+          ssh root@${DES_ENV_LS} "chown -R hundsun:oinstall /home/hundsun/appcom; ls -l /home/hundsun/appcom"
+          ssh root@${DES_ENV_LS} "chown -R hundsun:oinstall /home/hundsun/linux.i386; ls -l /home/hundsun/linux.i386"
+      - name: LS start
+        script: |
+          echo ---------------------------LS is starting！-------------------------------          
+          ssh root@${DES_ENV_LS} "su - hundsun -s /bin/bash /home/h3c_file/LS_run.sh" & exit
+      - name: LS check
+        script: |
+          echo "please wait !"
+          sleep 180
+          echo ---------------------------LS is checking！-------------------------------          
+          ssh root@${DES_ENV_LS} "su - hundsun -s /bin/bash /home/h3c_file/LS_check.sh"
