@@ -1,16 +1,20 @@
 flow:
   - envs:
         FLOW_WELCOME_MESSAGE: hello.world
-        FLOW_AGENT: linux-192.25.108.236（DBcopy）
-        ORI_DB_IP: 192.25.105.30
-        DES_DB_IP: 192.25.108.236
+        FLOW_AGENT: linux-192.25.108.172（DBcopy）
     steps:
+      - name: init
+        script: |
+            echo "源环境数据库IP:${ORI_ENV_DB}"
+            echo "目标环境数据库IP:${DES_ENV_DB}"
       - name: 停止源数据库
         script: |
-            ssh root@${ORI_DB_IP} "su - oracle -s /bin/bash /home/h3c_file/DB_stop.sh"
+            echo "源环境:${ORI_ENV_DB}"
+            ssh root@${ORI_ENV_DB} "su - oracle -s /bin/bash /home/h3c_file/DB_stop.sh"
       - name: 停止目标数据库
         script: |
-            ssh root@${DES_DB_IP} "su - oracle -s /bin/bash /home/h3c_file/DB_stop.sh"
+            echo "目标环境:${DES_ENV_DB}"
+            ssh root@${DES_ENV_DB} "su - oracle -s /bin/bash /home/h3c_file/DB_stop.sh"
       - name: 清空目标原始数据库
         script: |
             echo ==============================
@@ -43,8 +47,8 @@ flow:
             echo   
             echo 开始传输......
             ftp -n <<- EOF
-            open ${ORI_DB_IP}
-            user ftpuser ftpuser/#Xyzq105030
+            open ${ORI_ENV_DB}
+            user ftpuser ftpuser
             binary
             cd /u01/app/oracle/fast_recovery_area/uf20/
             pwd
@@ -74,7 +78,7 @@ flow:
             echo ================================================================
             echo  文件大小预计：42M
             echo “当前路径:/u01/app/oracle/product/11.2.0/db_1/dbs/”
-            wget -nH -r   -np --cut-dirs=8 ftp://${ORI_DB_IP}:21/../../u01/app/oracle/product/11.2.0/db_1/dbs/* --ftp-user=ftpuser --ftp-password=ftpuser -P /u01/app/oracle/product/11.2.0/db_1/
+            wget -nH -r   -np --cut-dirs=8 ftp://${ORI_ENV_DB}:21/../../u01/app/oracle/product/11.2.0/db_1/dbs/* --ftp-user=ftpuser --ftp-password=ftpuser -P /u01/app/oracle/product/11.2.0/db_1/
             chown -R oracle:oinstall /u01/app/oracle/product/11.2.0/db_1/dbs/
             echo ================================================================
             echo
@@ -94,8 +98,8 @@ flow:
             echo  文件大小预计：40G
             echo “当前路径:/u01/app/oracle/oradata/UF20/”
             ftp -n <<- EOF
-            open ${ORI_DB_IP}
-            user ftpuser ftpuser/#Xyzq105030
+            open ${ORI_ENV_DB}
+            user ftpuser ftpuser
             binary
             cd /u01/app/oracle/oradata/UF20/
             lcd /u01/app/oracle/oradata/UF20/
@@ -121,8 +125,8 @@ flow:
             echo  文件大小预计：380G
             echo “当前路径:/u01/app/oracle/oradata/uf20/”
             ftp -n <<- EOF
-            open ${ORI_DB_IP}
-            user ftpuser ftpuser/#Xyzq105030
+            open ${ORI_ENV_DB}
+            user ftpuser ftpuser
             binary
             cd /u01/app/oracle/oradata/uf20/
             lcd /u01/app/oracle/oradata/uf20/
@@ -137,14 +141,17 @@ flow:
             echo 
             echo            "/u01/app/oracle/oradata/uf20/复制成功！"
             echo ================================================================  
+            echo 权限刷新
+            chown -R oracle:oinstall  /u01/app/oracle/*
       - name: 启动源数据库
         script: |
-            ssh root@${ORI_DB_IP} "su - oracle -s /bin/bash /home/h3c_file/DB_start.sh"
+            echo 刷新目标数据库文件权限
+            ssh root@${ORI_ENV_DB} "su - oracle -s /bin/bash /home/h3c_file/DB_start.sh"
       - name: 启动目标数据库
         script: |
-            ssh root@${DES_DB_IP} "su - oracle -s /bin/bash /home/h3c_file/DB_start.sh"
+            ssh root@${DES_ENV_DB} "su - oracle -s /bin/bash /home/h3c_file/DB_start.sh"
       - name: 检查数据库
         script: |
             echo ------------监听检查---------------------
-            ssh root@${DES_DB_IP} "su - oracle -s /bin/bash /home/h3c_file/DB_check.sh"
+            ssh root@${DES_ENV_DB} "su - oracle -s /bin/bash /home/h3c_file/DB_check.sh"
               

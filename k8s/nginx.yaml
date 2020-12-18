@@ -11,3 +11,10 @@ spec:
     ports:
     - name: web
       containerPort: 80
+  - name: busybox
+    image: docker.io/busybox:latest
+    imagePullPolicy: IfNotPresent
+    command: ["sleep","3600"]
+    ports:
+    - name: web
+      containerPort: 81
