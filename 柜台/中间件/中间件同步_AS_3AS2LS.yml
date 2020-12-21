@@ -28,6 +28,21 @@ flow:
           echo "目标环境AS3：${DES_ENV_AS3}"
           ssh root@${DES_ENV_AS3} "su - hundsun -s /bin/bash /home/h3c_file/AS_stop.sh"
           echo "AS3 is stopped"
+      - name: AS1-备份nrs.xml文件
+        script: |
+          echo 正在上传
+          echo ---------------------------AS1  backup！-------------------------------          
+          ssh root@${DES_ENV_AS1} "su - hundsun -s /bin/bash /home/h3c_file/AS_backup.sh"
+      - name: AS2-备份nrs.xml文件
+        script: |
+          echo 正在上传
+          echo ---------------------------AS2  backup！-------------------------------          
+          ssh root@${DES_ENV_AS2} "su - hundsun -s /bin/bash /home/h3c_file/AS_backup.sh"
+      - name: AS3-备份nrs.xml文件
+        script: |
+          echo 正在上传
+          echo ---------------------------AS3  backup！-------------------------------          
+          ssh root@${DES_ENV_AS3} "su - hundsun -s /bin/bash /home/h3c_file/AS_backup.sh"
       - name: init-AS相关配置
         script: |
           echo ---------------------------AS正在复制-------------------------------

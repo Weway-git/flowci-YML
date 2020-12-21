@@ -13,6 +13,11 @@ flow:
           echo ---------------------------LS is stopping！-------------------------------          
           ssh root@${DES_ENV_LS} "su - hundsun -s /bin/bash /home/h3c_file/LS_stop.sh"
           echo "LS is stopped"
+      - name: LS-备份nrs.xml文件
+        script: |
+          echo 正在上传
+          echo ---------------------------LS  backup！-------------------------------          
+          ssh root@${DES_ENV_LS} "su - hundsun -s /bin/bash /home/h3c_file/LS_backup.sh"
       - name: init-LS相关配置
         script: |
           echo ---------------------------LS正在复制-------------------------------

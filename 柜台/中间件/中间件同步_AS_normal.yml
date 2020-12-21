@@ -15,6 +15,11 @@ flow:
           echo "源环境AS：${ORI_ENV_AS}"
           ssh root@${DES_ENV_AS} "su - hundsun -s /bin/bash /home/h3c_file/AS_stop.sh"
           echo "AS is stopped"
+      - name: AS-备份nrs.xml文件
+        script: |
+          echo 正在上传
+          echo ---------------------------AS  backup！-------------------------------          
+          ssh root@${DES_ENV_AS} "su - hundsun -s /bin/bash /home/h3c_file/AS_backup.sh"
       - name: init-AS相关配置
         script: |
           echo ---------------------------AS正在复制-------------------------------
@@ -65,7 +70,6 @@ flow:
           sed -i  "s/$ORI_ENV_AS/$DES_ENV_AS/g"  nrs.xml
           sed -i  "s/$ORI_ENV_LS/$DES_ENV_LS/g"  nrs.xml
           cat nrs.xml
-
       - name: AS-将配置上传到目标环境-appcom
         script: |
           echo 正在上传
