@@ -1,7 +1,7 @@
 flow:
   - envs:
         FLOW_WELCOME_MESSAGE: hello.world
-        FLOW_AGENT: linux-192.25.108.172（DBcopy）
+        FLOW_AGENT: linux-192.25.105.141（DBcopy）
     steps:
       - name: init
         script: |
@@ -11,6 +11,9 @@ flow:
         script: |
             echo "源环境:${ORI_ENV_DB}"
             ssh root@${ORI_ENV_DB} "su - oracle -s /bin/bash /home/h3c_file/DB_stop.sh"
+      - name: 获取源数据库ftp目录权限
+        script: |
+            ssh root@${ORI_ENV_DB} "chmod -R 755 /u01/app/oracle/"
       - name: 停止目标数据库
         script: |
             echo "目标环境:${DES_ENV_DB}"
