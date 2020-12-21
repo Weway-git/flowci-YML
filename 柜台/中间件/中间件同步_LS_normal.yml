@@ -3,6 +3,11 @@ flow:
         FLOW_WELCOME_MESSAGE: hello.world
         FLOW_AGENT: linux-192.25.106.220
     steps:
+      - name: init
+        script: |
+          echo ---------------------------LS info-------------------------------    
+          echo "目标环境LS：${DES_ENV_LS}"
+          echo "源环境LS：${ORI_ENV_LS}"
       - name: 停止目标环境LS
         script: |
           echo ---------------------------LS is stopping！-------------------------------          
@@ -53,7 +58,9 @@ flow:
           mv   /h3c/ZJJ/LS/workspace/nrs_backup.xml /h3c/ZJJ/LS/workspace/nrs.xml
           # 临时修复修改nrs.xml
           cd /h3c/ZJJ/LS/workspace/
+          sed -i  "s/$ORI_ENV_AS/$DES_ENV_AS/g"  nrs.xml
           sed -i  "s/$ORI_ENV_LS/$DES_ENV_LS/g"  nrs.xml
+          cat nrs.xml
       - name: LS-将配置上传到目标环境-appcom
         script: |
           echo 正在上传

@@ -1,0 +1,144 @@
+flow:
+  - envs:
+        FLOW_WELCOME_MESSAGE: hello.world
+        FLOW_AGENT: linux-192.25.106.220
+    steps:
+      - name: init
+        script: |
+          echo ---------------------------AS info-------------------------------    
+          echo "目标环境LS1：${DES_ENV_LS1}"
+          echo "目标环境LS2：${DES_ENV_LS2}"
+          echo "源环境AS：${ORI_ENV_AS}"
+      - name: 停止目标环境LS1
+        script: |
+          echo ---------------------------LS1 is stopping！-------------------------------    
+          echo "目标环境LS1：${DES_ENV_LS1}"
+          ssh root@${DES_ENV_LS1} "su - hundsun -s /bin/bash /home/h3c_file/LS_stop.sh"
+          echo "LS1 is stopped"
+      - name: 停止目标环境LS2
+        script: |
+          echo ---------------------------LS2 is stopping！-------------------------------    
+          echo "目标环境LS2：${DES_ENV_LS2}"
+          ssh root@${DES_ENV_LS2} "su - hundsun -s /bin/bash /home/h3c_file/LS_stop.sh"
+          echo "LS2 is stopped"
+      - name: init-AS相关配置
+        script: |
+          echo ---------------------------AS正在复制-------------------------------
+      - name: AS-workspace-xml-cert-license下载
+        script: |
+          echo "正在下载xml"
+          scp -rp root@${ORI_ENV_AS}:/home/hundsun/workspace/*.xml /h3c/ZJJ/AS/workspace
+          echo "xml finished"
+          echo "正在下载cert"
+          scp -rp root@${ORI_ENV_AS}:/home/hundsun/workspace/cert /h3c/ZJJ/AS/workspace/
+          echo "正在下载license"
+          scp -rp root@${ORI_ENV_AS}:/home/hundsun/workspace/license /h3c/ZJJ/AS/workspace/
+      - name: AS-workspace-runall-stopall下载
+        script: |
+          echo "正在下载runall文件"
+          scp -rp root@${ORI_ENV_AS}:/home/hundsun/workspace/runall /h3c/ZJJ/AS/workspace/
+          echo "正在下载stopall文件"
+          scp -rp root@${ORI_ENV_AS}:/home/hundsun/workspace/stopall /h3c/ZJJ/AS/workspace/
+          echo "finished!"
+      - name: AS-workspace-updatedir下载
+        script: |
+          echo "正在下载updatedir文件"
+          scp -rp root@${ORI_ENV_AS}:/home/hundsun/workspace/updatedir /h3c/ZJJ/AS/workspace/
+          echo "finished！"
+      - name: AS-appcom下载
+        script: |
+          echo "正在下载appcom文件"
+          scp -rp root@${ORI_ENV_AS}:/home/hundsun/appcom /h3c/ZJJ/AS/
+          echo "finished！"
+      - name: AS-linux.i386下载
+        script: |
+          echo "正在下载linux.i386文件"
+          scp -rp root@${ORI_ENV_AS}:/home/hundsun/linux.i386 /h3c/ZJJ/AS/
+          echo "finished！"
+      - name: LS1-修改配置-workspace
+        script: |
+          java -version
+          echo 正在修改...
+          # 临时修复
+          mv /h3c/ZJJ/AS/workspace/nrs.xml  /h3c/ZJJ/AS/workspace/nrs_backup.xml 
+          java -jar /h3c/plugin/demo.jar --ip.as=${DES_ENV_LS1} --ip.ls=${DES_ENV_LS1} --ip.database=${DES_ENV_DB} --file.location.workspace=/h3c/ZJJ/AS/workspace/
+          mv /h3c/ZJJ/AS/workspace/nrs_backup.xml   /h3c/ZJJ/AS/workspace/nrs.xml 
+          # 临时修复修改nrs.xml
+          cd /h3c/ZJJ/AS/workspace/
+          sed -i  "s/$ORI_ENV_AS/$DES_ENV_LS1/g"  nrs.xml
+          sed -i  "s/$ORI_ENV_LS/$DES_ENV_LS1/g"  nrs.xml
+          cat nrs.xml
+      - name: LS1-将配置上传到目标环境-appcom
+        script: |
+          echo 正在上传
+          scp -rp /h3c/ZJJ/AS/appcom root@${DES_ENV_LS1}:/home/hundsun/ 
+      - name: LS1-将配置上传到目标环境-linux.i386
+        script: |
+          echo 正在上传
+          scp -rp /h3c/ZJJ/AS/linux.i386 root@${DES_ENV_LS1}:/home/hundsun/ 
+      - name: LS1-将配置上传到目标环境-workspace
+        script: |
+          echo 正在上传
+          scp -rp /h3c/ZJJ/AS/workspace/ root@${DES_ENV_LS1}:/home/hundsun/
+      - name: AS-workspace-xml-cert-license下载-2
+        script: |
+          echo "正在下载xml"
+          scp -rp root@${ORI_ENV_AS}:/home/hundsun/workspace/*.xml /h3c/ZJJ/AS/workspace
+          echo "xml finished"
+          echo "正在下载cert"
+          scp -rp root@${ORI_ENV_AS}:/home/hundsun/workspace/cert /h3c/ZJJ/AS/workspace/
+          echo "正在下载license"
+          scp -rp root@${ORI_ENV_AS}:/home/hundsun/workspace/license /h3c/ZJJ/AS/workspace/
+      - name: LS2-修改配置-workspace
+        script: |
+          java -version
+          echo 正在修改...
+          # 临时修复
+          mv /h3c/ZJJ/AS/workspace/nrs.xml  /h3c/ZJJ/AS/workspace/nrs_backup.xml 
+          java -jar /h3c/plugin/demo.jar --ip.as=${DES_ENV_LS2} --ip.ls=${DES_ENV_LS2} --ip.database=${DES_ENV_DB} --file.location.workspace=/h3c/ZJJ/AS/workspace/
+          mv /h3c/ZJJ/AS/workspace/nrs_backup.xml   /h3c/ZJJ/AS/workspace/nrs.xml 
+          # 临时修复修改nrs.xml
+          cd /h3c/ZJJ/AS/workspace/
+          sed -i  "s/$ORI_ENV_AS/$DES_ENV_LS2/g"  nrs.xml
+          sed -i  "s/$ORI_ENV_LS/$DES_ENV_LS2/g"  nrs.xml
+          cat nrs.xml
+      - name: LS2-将配置上传到目标环境-workspace
+        script: |
+          echo 正在上传
+          scp -rp /h3c/ZJJ/AS/workspace/ root@${DES_ENV_LS2}:/home/hundsun/
+      - name: LS1刷新文件权限
+        script: |
+          echo ================================================================
+          echo         本阶段刷新文件权限
+          echo         文件路径：/home/hundsun/
+          echo 
+          echo ================================================================
+          ssh root@${DES_ENV_LS1} "chown -R hundsun:oinstall /home/hundsun/workspace; ls -l /home/hundsun/workspace"
+          ssh root@${DES_ENV_LS1} "chown -R hundsun:oinstall /home/hundsun/appcom; ls -l /home/hundsun/appcom"
+          ssh root@${DES_ENV_LS1} "chown -R hundsun:oinstall /home/hundsun/linux.i386; ls -l /home/hundsun/linux.i386"
+      - name: LS2刷新文件权限
+        script: |
+          echo ================================================================
+          echo         本阶段刷新文件权限
+          echo         文件路径：/home/hundsun/
+          echo 
+          echo ================================================================
+          ssh root@${DES_ENV_LS2} "chown -R hundsun:oinstall /home/hundsun/workspace; ls -l /home/hundsun/workspace"
+          ssh root@${DES_ENV_LS2} "chown -R hundsun:oinstall /home/hundsun/appcom; ls -l /home/hundsun/appcom"
+          ssh root@${DES_ENV_LS2} "chown -R hundsun:oinstall /home/hundsun/linux.i386; ls -l /home/hundsun/linux.i386"
+      - name: LS1 start
+        script: |
+          echo ---------------------------LS1 is starting！-------------------------------          
+          ssh root@${DES_ENV_LS1} "su - hundsun -s /bin/bash /home/h3c_file/LS_run.sh" & exit
+      - name: LS1 check
+        script: |
+          echo ---------------------------LS1 is checking！-------------------------------          
+          ssh root@${DES_ENV_LS1} "su - hundsun -s /bin/bash /home/h3c_file/LS_check.sh"
+      - name: LS2 start
+        script: |
+          echo ---------------------------LS2 is starting！-------------------------------          
+          ssh root@${DES_ENV_LS2} "su - hundsun -s /bin/bash /home/h3c_file/LS_run.sh" & exit
+      - name: LS2 check
+        script: |
+          echo ---------------------------LS2 is checking！-------------------------------          
+          ssh root@${DES_ENV_LS2} "su - hundsun -s /bin/bash /home/h3c_file/LS_check.sh"

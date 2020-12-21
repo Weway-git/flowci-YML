@@ -3,9 +3,16 @@ flow:
         FLOW_WELCOME_MESSAGE: hello.world
         FLOW_AGENT: linux-192.25.106.220
     steps:
+      - name: init
+        script: |
+          echo ---------------------------AS info-------------------------------    
+          echo "目标环境AS：${DES_ENV_AS}"
+          echo "源环境AS：${ORI_ENV_AS}"
       - name: 停止目标环境AS
         script: |
-          echo ---------------------------AS is stopping！-------------------------------          
+          echo ---------------------------AS is stopping！-------------------------------    
+          echo "目标环境AS：${DES_ENV_AS}"
+          echo "源环境AS：${ORI_ENV_AS}"
           ssh root@${DES_ENV_AS} "su - hundsun -s /bin/bash /home/h3c_file/AS_stop.sh"
           echo "AS is stopped"
       - name: init-AS相关配置
@@ -56,6 +63,8 @@ flow:
           # 临时修复修改nrs.xml
           cd /h3c/ZJJ/AS/workspace/
           sed -i  "s/$ORI_ENV_AS/$DES_ENV_AS/g"  nrs.xml
+          sed -i  "s/$ORI_ENV_LS/$DES_ENV_LS/g"  nrs.xml
+          cat nrs.xml
 
       - name: AS-将配置上传到目标环境-appcom
         script: |
