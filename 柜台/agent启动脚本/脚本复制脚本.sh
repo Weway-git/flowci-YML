@@ -11,3 +11,7 @@ rpm -ivh  vsftpd-2.2.2-24.el6.x86_64.rpm --nodeps
 service  vsftpd start
 useradd ftpuser
 passwd ftpuser
+
+
+# crontab 每天一点执行
+0 1 * * ?

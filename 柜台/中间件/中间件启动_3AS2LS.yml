@@ -1,0 +1,56 @@
+# flow.ci templates
+
+flow:
+  - envs:
+      FLOW_WELCOME_MESSAGE: "hello.world"
+      FLOW_AGENT: linux-192.25.106.220
+    steps:
+      - name: init
+        script: |
+          echo ---------------------------LS info-------------------------------    
+          echo "目标环境LS1：${DES_ENV_LS1}"
+          echo "目标环境LS2：${DES_ENV_LS2}"
+          echo ---------------------------AS info-------------------------------    
+          echo "目标环境AS1：${DES_ENV_AS1}"
+          echo "目标环境AS2：${DES_ENV_AS2}"
+          echo "目标环境AS3：${DES_ENV_AS3}"
+      - name: LS1 start
+        script: |
+          echo ---------------------------LS1 is starting！-------------------------------          
+          ssh root@${DES_ENV_LS1} "su - hundsun -s /bin/bash /home/h3c_file/LS_run.sh" & exit
+      - name: LS1 check
+        script: |
+          echo ---------------------------LS1 is checking！-------------------------------          
+          ssh root@${DES_ENV_LS1} "su - hundsun -s /bin/bash /home/h3c_file/LS_check.sh"
+      - name: LS2 start
+        script: |
+          echo ---------------------------LS2 is starting！-------------------------------          
+          ssh root@${DES_ENV_LS2} "su - hundsun -s /bin/bash /home/h3c_file/LS_run.sh" & exit
+      - name: LS2 check
+        script: |
+          echo ---------------------------LS2 is checking！-------------------------------          
+          ssh root@${DES_ENV_LS2} "su - hundsun -s /bin/bash /home/h3c_file/LS_check.sh"
+      - name: AS1 start
+        script: |
+          echo ---------------------------AS1 is starting！-------------------------------          
+          ssh root@${DES_ENV_AS1} "su - hundsun -s /bin/bash /home/h3c_file/AS_run.sh" & exit
+      - name: AS1 check
+        script: |
+          echo ---------------------------AS1 is checking！-------------------------------          
+          ssh root@${DES_ENV_AS1} "su - hundsun -s /bin/bash /home/h3c_file/AS_check.sh"
+      - name: AS2 start
+        script: |
+          echo ---------------------------AS2 is starting！-------------------------------          
+          ssh root@${DES_ENV_AS2} "su - hundsun -s /bin/bash /home/h3c_file/AS_run.sh" & exit
+      - name: AS2 check
+        script: |
+          echo ---------------------------AS2 is checking！-------------------------------          
+          ssh root@${DES_ENV_AS2} "su - hundsun -s /bin/bash /home/h3c_file/AS_check.sh"
+      - name: AS3 start
+        script: |
+          echo ---------------------------AS3 is starting！-------------------------------          
+          ssh root@${DES_ENV_AS3} "su - hundsun -s /bin/bash /home/h3c_file/AS_run.sh" & exit
+      - name: AS3 check
+        script: |
+          echo ---------------------------AS3 is checking！-------------------------------          
+          ssh root@${DES_ENV_AS3} "su - hundsun -s /bin/bash /home/h3c_file/AS_check.sh"

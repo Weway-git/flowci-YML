@@ -1,0 +1,46 @@
+# flow.ci templates
+
+flow:
+  - envs:
+      FLOW_WELCOME_MESSAGE: "hello.world"
+      FLOW_AGENT: linux-192.25.106.220
+    steps:
+      - name: init
+        script: |
+          echo ---------------------------LS info-------------------------------    
+          echo "目标环境LS1：${DES_ENV_LS1}"
+          echo "目标环境LS2：${DES_ENV_LS2}"
+          echo ---------------------------AS info-------------------------------    
+          echo "目标环境AS1：${DES_ENV_AS1}"
+          echo "目标环境AS2：${DES_ENV_AS2}"
+          echo "目标环境AS3：${DES_ENV_AS3}"
+      - name: 停止目标环境LS1
+        script: |
+          echo ---------------------------LS1 is stopping！-------------------------------    
+          echo "目标环境LS1：${DES_ENV_LS1}"
+          ssh root@${DES_ENV_LS1} "su - hundsun -s /bin/bash /home/h3c_file/LS_stop.sh"
+          echo "LS1 is stopped"
+      - name: 停止目标环境LS2
+        script: |
+          echo ---------------------------LS2 is stopping！-------------------------------    
+          echo "目标环境LS2：${DES_ENV_LS2}"
+          ssh root@${DES_ENV_LS2} "su - hundsun -s /bin/bash /home/h3c_file/LS_stop.sh"
+          echo "LS2 is stopped"
+      - name: 停止目标环境AS1
+        script: |
+          echo ---------------------------AS1 is stopping！-------------------------------    
+          echo "目标环境AS1：${DES_ENV_AS1}"
+          ssh root@${DES_ENV_AS1} "su - hundsun -s /bin/bash /home/h3c_file/AS_stop.sh"
+          echo "AS1 is stopped"
+      - name: 停止目标环境AS2
+        script: |
+          echo ---------------------------AS2 is stopping！-------------------------------    
+          echo "目标环境AS2：${DES_ENV_AS2}"
+          ssh root@${DES_ENV_AS2} "su - hundsun -s /bin/bash /home/h3c_file/AS_stop.sh"
+          echo "AS2 is stopped"
+      - name: 停止目标环境AS3
+        script: |
+          echo ---------------------------AS3 is stopping！-------------------------------    
+          echo "目标环境AS3：${DES_ENV_AS3}"
+          ssh root@${DES_ENV_AS3} "su - hundsun -s /bin/bash /home/h3c_file/AS_stop.sh"
+          echo "AS3 is stopped"
