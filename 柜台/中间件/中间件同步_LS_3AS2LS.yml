@@ -22,7 +22,7 @@ flow:
           ssh root@${DES_ENV_LS2} "su - hundsun -s /bin/bash /home/h3c_file/LS_stop.sh"
           echo "LS2 is stopped"
       - name: LS1-备份nrs.xml文件
-        script: |
+        script: | 
           echo 正在上传
           echo ---------------------------LS1  backup！-------------------------------          
           ssh root@${DES_ENV_LS1} "/bin/bash /home/h3c_file/LS_backup.sh"

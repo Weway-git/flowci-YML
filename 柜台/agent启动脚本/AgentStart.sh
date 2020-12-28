@@ -1,1 +1,1 @@
-nohup java -jar flow-agent.jar http://192.25.106.220:8081/flow-api e4aa1121-90d1-4a37-83f9-8968076687d5  &
+nohup java -jar flow-agent.jar http://192.25.106.220:8081/flow-api 970d39d2-8558-4c91-baac-b8f3800273fd  &
