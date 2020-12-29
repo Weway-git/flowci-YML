@@ -78,9 +78,9 @@ flow:
       - name: DockerBuild
         script: |-
             cd /home/flow/h3c_devops_ci_web
-            docker build -t xingye-web:1.0.0 .
-            docker tag xingye-web:1.0.0  114.141.150.80:5000/weway/xingye:1.0.0
-            docker push 114.141.150.80:5000/weway/xingye:1.0.0
+            docker build -t web1.0 .
+            docker tag web1.0  registry.cn-shanghai.aliyuncs.com/devnavi/web:1.0.0
+            docker push registry.cn-shanghai.aliyuncs.com/devnavi/web:1.0.0
 
             # 停止所有镜像
             docker rmi $(docker images -f "dangling=true" -q)
