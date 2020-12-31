@@ -68,7 +68,7 @@ flow:
           # 临时修复修改nrs.xml
           cd /h3c/ZJJ/AS/workspace/
           sed -i  "s/$ORI_ENV_AS1/$DES_ENV_AS1/g"  nrs.xml
-          sed -i  "s/$ORI_ENV_;LS1/$DES_ENV_LS1/g"  nrs.xml
+          sed -i  "s/$ORI_ENV_LS1/$DES_ENV_LS1/g"  nrs.xml
           cat nrs.xml
       - name: AS-将配置上传到目标环境-appcom
         script: |

@@ -1,0 +1,38 @@
+# 自有数据库
+MYSQL_USER
+MYSQL_PASSWORD
+
+
+
+# 系统本地ip
+LOCAL_IP
+
+
+# 版本比对端口
+REVERSION_PORT
+
+# flow后台端口
+FLOW_API_PORT
+# FKOW后台地址
+FLOW_API_DOMAIN
+
+# flowweb的地址
+FLOW_WEB_DOMAIN
+
+# jenkins地址  http://192.25.106.69:8080/jenkins
+JENKINS_URL
+
+# JENKINS  user
+JENKINS_USERNAME
+
+# JENKINS 密码
+JENKINS_PASSWORD
+
+# sonar.url
+SONAR_URL
+
+# sonar.username=admin
+SONAR_USERNAME
+
+# sonar.password
+SONAR_PASSWORD
