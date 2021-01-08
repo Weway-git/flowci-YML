@@ -2,11 +2,8 @@
 MYSQL_USER
 MYSQL_PASSWORD
 
-
-
 # 系统本地ip
 LOCAL_IP
-
 
 # 版本比对端口
 REVERSION_PORT
@@ -20,7 +17,7 @@ FLOW_API_DOMAIN
 FLOW_WEB_DOMAIN
 
 # jenkins地址  http://192.25.106.69:8080/jenkins
-JENKINS_URL
+JENKINS_URL=http://192.25.106.69:8080/jenkins
 
 # JENKINS  user
 JENKINS_USERNAME
@@ -36,3 +33,5 @@ SONAR_USERNAME
 
 # sonar.password
 SONAR_PASSWORD
+
+

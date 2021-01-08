@@ -1,7 +1,7 @@
 flow:
   - envs:
         FLOW_WELCOME_MESSAGE: hello.world
-        FLOW_AGENT: linux-192.25.108.236（DBcopy）
+        FLOW_AGENT: linux-192.25.108.127（DBcopy）
     steps:
       - name: init
         script: |
@@ -157,4 +157,12 @@ flow:
         script: |
             echo ------------监听检查---------------------
             ssh root@${DES_ENV_DB_JG} "su - oracle -s /bin/bash /home/h3c_file/DB_check.sh"
-              
+      - name: 阶段后启动源数据库
+        isFinal: true
+        script: |
+            ssh root@${ORI_ENV_DB_JG} "su - oracle -s /bin/bash /home/h3c_file/DB_start.sh"
+      - name: 阶段后检查源数据库
+        isFinal: true
+        script: |
+            echo ------------源数据库监听检查---------------------
+            ssh root@${ORI_ENV_DB_JG} "su - oracle -s /bin/bash /home/h3c_file/DB_check.sh"

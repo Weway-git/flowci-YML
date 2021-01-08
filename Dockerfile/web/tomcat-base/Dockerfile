@@ -1,3 +1,0 @@
-FROM tomcat:latest
-LABEL MAINTAINER="1419864987@qq.com"
-

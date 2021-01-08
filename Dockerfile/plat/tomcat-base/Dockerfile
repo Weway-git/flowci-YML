@@ -1,0 +1,5 @@
+FROM tomcat:9.0-jdk8-corretto
+LABEL MAINTAINER="1419864987@qq.com"
+
+ENV FLOW_PLAT_DIR=/usr/local/tomcat
+WORKDIR $FLOW_PLAT_DIR
