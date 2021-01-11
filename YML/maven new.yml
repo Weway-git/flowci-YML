@@ -2,15 +2,14 @@ flow:
     - envs:
         FLOW_WELCOME_MESSAGE: hello.world
         FLOW_AGENT: linux-agent1
-
-        
         FLOW_PATH: /home/flow/
         FlOW_APP_NAME: h3c_devops_ci_platform
         FLOW_CONFIGURATION: /home/flow/Configuration/
         FLOW_SCRIPT: /home/flow/script
         FLOW_RUN_PATH: /usr/local/apache-tomcat-9.0.24/webapps
         APACHE_TOMCAT_HOME: /usr/local/apache-tomcat-9.0.24
-        PROJECT_URL: 172.16.0.3
+        PROJECT_URL: 47.116.137.249
+        JAVA_OPTS: "-Dhudson.security.csrf.GlobalCrumbIssuerConfiguration.DISABLE_CSRF_PROTECTION=true"
       steps:
        - name: Init
          script: |-
@@ -40,7 +39,7 @@ flow:
              cd ${FLOW_PATH}
              cd ${FlOW_APP_NAME}
              git checkout .
-             git pull
+             git pull | true
              git checkout ${FLOW_GIT_BRANCH}
              git pull
            else
@@ -85,6 +84,7 @@ flow:
            echo "Start APACHE-TOMCAT...."
            sh ${APACHE_TOMCAT_HOME}/bin/startup.sh
            echo "APACHE-TOMCAT start success"
+           
        - name: Auto Test
          isFinal: true
          script: |-

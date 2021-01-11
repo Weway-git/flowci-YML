@@ -1,5 +1,6 @@
 docker run -it \
    --name plat1  \
+   -e LOCAL_IP=192.168.43.150 \
    -e MYSQL_HOST=47.116.137.249 \
    -e MYSQL_USER=root \
    -e MYSQL_PASSWORD=qiang666 \
@@ -8,6 +9,7 @@ docker run -it \
    -e FLOW_API_DOMAIN=192.168.43.150 \
    -e FLOW_API_PORT=8080 \
    -e FLOW_WEB_DOMAIN=192.168.43.150 \
+   -e REVERSION_PORT=8090 \
    -e JENKINS_URL=http://47.116.137.249:8080/jenkins/  \
    -e JENKINS_USERNAME=admin  \
    -e JENKINS_PASSWORD=123456  \
@@ -15,4 +17,4 @@ docker run -it \
    -e SONAR_USERNAME=admin  \
    -e SONAR_PASSWORD=123456  \
    -p 8080:8080 \
-    registry.cn-shanghai.aliyuncs.com/devnavi/platform:1.0.1
+    registry.cn-shanghai.aliyuncs.com/devnavi/platform:1.0.3
