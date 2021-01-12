@@ -7,12 +7,10 @@ flow:
         FlOW_APP_NAME: h3c_devops_ci_web
         FLOW_CONFIGURATION: /home/flow/Configuration/
         FLOW_NGINX_HTML_PATH: /usr/share/nginx/html
-        PROJECT_URL: 172.16.0.3
+        PROJECT_URL: 47.116.137.249
     steps:
       - name: Init
         script: |-
-            cat /home/flow/Configuration/h3c_devops_ci_web/index.html
-            echo ${FLOW_WELCOME_MESSAGE}
             echo git address is ${FLOW_GIT_URL}
             if [ -d ${FLOW_PATH} ];then
               echo "FlowPath is existed"
@@ -48,13 +46,13 @@ flow:
               git checkout ${FLOW_GIT_BRANCH}
               echo FlOW_APP_NAME is ${FlOW_APP_NAME}
             fi
-      - name: ConfigurationDistribution
+      - name: Docker init
         script: |-
-            cd ${FLOW_CONFIGURATION}
-            cd ${FlOW_APP_NAME}
-            cp -rf * ${FLOW_PATH}/${FlOW_APP_NAME}/src/
-            cd ${FLOW_PATH}/${FlOW_APP_NAME}/src/
-            cat index.html
+            cd ${FLOW_PATH}/${FlOW_APP_NAME}
+            rm -f ./src/index.html
+            cp -f ./docker/index.html ./src/index.html
+            echo index.html will be:
+            cat ./src/index.html
       - name: CnpmInit
         script: |-
             echo "module initing..."
@@ -63,49 +61,17 @@ flow:
             npm config set registry https://registry.npm.taobao.org
             npm install --unsafe-perm
             echo "module init finished"
-            echo "Cnpm environment is OK"
-            # cnpm run clean
+            echo "npm environment is OK"
       - name: BuildArtifact
         script: |-
             cd ${FLOW_PATH}
             cd ${FlOW_APP_NAME}
             # 这里需要加判断，cnpm是否安装
-            cnpm run build
+            npm run build
             ls ./dist
-            cd dist
-            tar -cvf webdist.tar *
-            mv webdist.tar /home/flow/Publish
-      - name: DockerBuild
+      - name: Docker Build
         script: |-
-            cd /home/flow/h3c_devops_ci_web
-            docker build -t web1.0 .
-            docker tag web1.0  registry.cn-shanghai.aliyuncs.com/devnavi/web:1.0.0
-            docker push registry.cn-shanghai.aliyuncs.com/devnavi/web:1.0.0
-
-            # 停止所有镜像
-            docker rmi $(docker images -f "dangling=true" -q)
-
-            # 清理none镜像
-            docker rmi $(docker images -f "dangling=true" -q)
-
-
-
-      - name: DeployProject
-        script: |-
-            rm -rf ${FLOW_NGINX_HTML_PATH}/*
-            echo ${FLOW_NGINX_HTML_PATH}
-            cd ${FLOW_PATH}
-            cd ${FlOW_APP_NAME}
-            cp -rf dist/* ${FLOW_NGINX_HTML_PATH}
-            echo "nginx reload...."
-            # 这里加判断 nginx是否启动
-            systemctl restart nginx
-            echo "nginx reload success"
-            cd ${FLOW_NGINX_HTML_PATH}
-            cat index.html
-      - name: Auto Test
-        isFinal: true
-        script: |
-              curl -I ${PROJECT_URL} 
-              curl -X POST "http://${PROJECT_URL}:8080/flow-api/user/login" -H "accept: */*" -H "Content-Type: application/json" -d "{ \"emailOrUsername\": \"admin\", \"password\": \"123456\"}"
-
+            cd ${FLOW_PATH}/${FlOW_APP_NAME}
+            docker build -t web .
+            docker tag web registry.cn-shanghai.aliyuncs.com/devnavi/web:latest
+            docker push registry.cn-shanghai.aliyuncs.com/devnavi/web:latest

@@ -7,7 +7,7 @@ flow:
         FlOW_APP_NAME: h3c_devops_ci_web
         FLOW_CONFIGURATION: /home/flow/Configuration/
         FLOW_NGINX_HTML_PATH: /usr/share/nginx/html
-        PROJECT_URL: 172.16.0.3
+        PROJECT_URL: 47.116.137.249
     steps:
       - name: Init
         script: |-
@@ -63,36 +63,18 @@ flow:
             npm config set registry https://registry.npm.taobao.org
             npm install --unsafe-perm
             echo "module init finished"
-            echo "Cnpm environment is OK"
+            echo "npm environment is OK"
             # cnpm run clean
       - name: BuildArtifact
         script: |-
             cd ${FLOW_PATH}
             cd ${FlOW_APP_NAME}
             # 这里需要加判断，cnpm是否安装
-            cnpm run build
+            npm run build
             ls ./dist
             cd dist
             tar -cvf webdist.tar *
             mv webdist.tar /home/flow/Publish
-      - name: DockerBuild
-        script: |-
-            cd /home/flow/h3c_devops_ci_web
-            docker build -t 172.22.205.63:5000/weway/xingye-web:lastest .
-            # docker tag xingye-web:1.0.0  47.116.137.249:5000/weway/xingye:1.0.0
-            #  
-            docker push 172.22.205.63:5000/weway/xingye-web
-            # 停止docker容器
-            docker kill xingye_web
-
-
-            # 清理none镜像
-            docker rmi -f $(docker images -f "dangling=true" -q)
-            # 启动镜像
-            # docker run -d  --name   xingye_web  -e FLOW_API_DOMAIN=47.116.137.249:8080 -p 81:80 172.22.205.63:5000/xingye-web
-
-
-
       - name: DeployProject
         script: |-
             rm -rf ${FLOW_NGINX_HTML_PATH}/*
@@ -111,4 +93,3 @@ flow:
         script: |
               curl -I ${PROJECT_URL} 
               curl -X POST "http://${PROJECT_URL}:8080/flow-api/user/login" -H "accept: */*" -H "Content-Type: application/json" -d "{ \"emailOrUsername\": \"admin\", \"password\": \"123456\"}"
-

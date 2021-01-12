@@ -1,90 +1,96 @@
 flow:
-    - envs:
+  - envs:
         FLOW_WELCOME_MESSAGE: hello.world
-        FLOW_AGENT: linux-agent1
         FLOW_PATH: /home/flow/
         FlOW_APP_NAME: h3c_devops_ci_platform
         FLOW_CONFIGURATION: /home/flow/Configuration/
         FLOW_SCRIPT: /home/flow/script
         FLOW_RUN_PATH: /usr/local/apache-tomcat-9.0.24/webapps
         APACHE_TOMCAT_HOME: /usr/local/apache-tomcat-9.0.24
-        PROJECT_URL: 172.16.0.3
-      steps:
-       - name: Init
-         script: |-
-           echo ${FLOW_WELCOME_MESSAGE}
-           echo git address is ${FLOW_GIT_URL}
-           if [ -d ${FLOW_PATH} ];then
-             echo "FlowPath is existed"
-             echo FlowPath is ${FLOW_PATH}
-             cd ${FLOW_PATH}
-           else
-             echo "not exist"
-             mkdir -p ${FLOW_PATH}
-             cd ${FLOW_PATH}
-             echo "FlowPath is created!"
-             echo FlowPath is ${FLOW_PATH}
-             cd ${FLOW_PATH}
-           fi
-           echo "start mysqld server"
-           service mysqld start
-       - name: InitSourceCode
-         script: |-
-           cd ${FLOW_PATH}
-           if [ -d $FlOW_APP_NAME ];then
-             echo "FlOW_APP_NAME is existed"
-             echo ${FlOW_APP_NAME}
-             echo ${FLOW_GIT_BRANCH}
-             cd ${FLOW_PATH}
-             cd ${FlOW_APP_NAME}
-             git checkout .
-             git pull
-             git checkout ${FLOW_GIT_BRANCH}
-             git pull
-           else
-             echo "FLOW_LOCAL_PATH not exist"
-             git clone ${FLOW_GIT_URL}
-             cd ${FLOW_PATH}
-             cd ${FlOW_APP_NAME}
-             git checkout .
-             git checkout ${FLOW_GIT_BRANCH}
-             echo FlOW_APP_NAME is ${FlOW_APP_NAME}
-           fi
-       - name: Mvn Init
-         script: |-
-           echo "mvn initing..."
-           mvn -v
-           echo "mvn ok"
-           java -version
-       - name: Build Artifact
-         script: |-
-           cd ${FLOW_PATH}
-           cd ${FlOW_APP_NAME}
-           mvn clean install -DskipTests=true
-           ls ./dist
-           # save artifact
-           cp -rf dist/flow-api-*.war /home/flow/Publish/flow-api.war
-           cp -rf dist/flow-control-center-*.war  /home/flow/Publish/flow-control-center.war
-       - name: DeployProject
-         allowFailure: false
-         script: |-
-           echo "Stop APACHE-TOMCAT"
-           sh ${FLOW_SCRIPT}/tomcat_up_check.sh
-           # check tomcat shut process
-           sh ${FLOW_SCRIPT}/tomcat_down_check.sh
-           export FLOW_API_CONFIG_PATH="/home/flow/Configuration/h3c_devops_ci_platform/app-api.properties"
-           export FLOW_CC_CONFIG_PATH="/home/flow/Configuration/h3c_devops_ci_platform/app-cc.properties"
-           rm -rf ${FLOW_RUN_PATH}/flow-*
-           echo ${FLOW_RUN_PATH}
-           cd ${FLOW_PATH}
-           cd ${FlOW_APP_NAME}
-           cp -rf dist/flow-api-*.war ${FLOW_RUN_PATH}/flow-api.war
-           cp -rf dist/flow-control-center-*.war  ${FLOW_RUN_PATH}/flow-control-center.war
-           echo "Start APACHE-TOMCAT...."
-           sh ${APACHE_TOMCAT_HOME}/bin/startup.sh
-           echo "APACHE-TOMCAT start success"
-       - name: Auto Test
-         isFinal: true
-         script: |-
-              curl -I ${PROJECT_URL}
-              curl -X POST "http://${PROJECT_URL}:8080/flow-api/user/login" -H "accept: */*" -H "Content-Type: application/json" -d "{ \"emailOrUsername\": \"admin\", \"password\": \"123456\"}"
+        PROJECT_URL: 47.116.137.249
+        JAVA_OPTS: -Dhudson.security.csrf.GlobalCrumbIssuerConfiguration.DISABLE_CSRF_PROTECTION=true
+    steps:
+      - name: Init
+        script: |-
+            echo ${FLOW_WELCOME_MESSAGE}
+            echo git address is ${FLOW_GIT_URL}
+            if [ -d ${FLOW_PATH} ];then
+              echo "FlowPath is existed"
+              echo FlowPath is ${FLOW_PATH}
+              cd ${FLOW_PATH}
+            else
+              echo "not exist"
+              mkdir -p ${FLOW_PATH}
+              cd ${FLOW_PATH}
+              echo "FlowPath is created!"
+              echo FlowPath is ${FLOW_PATH}
+              cd ${FLOW_PATH}
+            fi
+            echo "start mysqld server"
+            service mysqld start
+      - name: InitSourceCode
+        script: |-
+            cd ${FLOW_PATH}
+            if [ -d $FlOW_APP_NAME ];then
+              echo "FlOW_APP_NAME is existed"
+              echo ${FlOW_APP_NAME}
+              echo ${FLOW_GIT_BRANCH}
+              cd ${FLOW_PATH}
+              cd ${FlOW_APP_NAME}
+              git checkout .
+              git pull
+              git checkout ${FLOW_GIT_BRANCH}
+              git pull
+            else
+              echo "FLOW_LOCAL_PATH not exist"
+              git clone ${FLOW_GIT_URL}
+              cd ${FLOW_PATH}
+              cd ${FlOW_APP_NAME}
+              git checkout .
+              git checkout ${FLOW_GIT_BRANCH}
+              echo FlOW_APP_NAME is ${FlOW_APP_NAME}
+            fi
+      - name: Mvn Init
+        script: |-
+            echo "mvn initing..."
+            mvn -v
+            echo "mvn ok"
+            java -version
+      - name: Build Artifact
+        script: |-
+            cd ${FLOW_PATH}
+            cd ${FlOW_APP_NAME}
+            mvn clean install -DskipTests=true
+            ls ./dist
+            # save artifact
+            cp -rf dist/flow-api-*.war /home/flow/Publish/flow-api.war
+            cp -rf dist/flow-control-center-*.war  /home/flow/Publish/flow-control-center.war
+      - name: DeployProject
+        script: |-
+            echo "Stop APACHE-TOMCAT"
+            sh ${FLOW_SCRIPT}/tomcat_up_check.sh
+            # check tomcat shut process
+            sh ${FLOW_SCRIPT}/tomcat_down_check.sh
+            export FLOW_API_CONFIG_PATH="/home/flow/Configuration/h3c_devops_ci_platform/app-api.properties"
+            export FLOW_CC_CONFIG_PATH="/home/flow/Configuration/h3c_devops_ci_platform/app-cc.properties"
+            rm -rf ${FLOW_RUN_PATH}/flow-*
+            echo ${FLOW_RUN_PATH}
+            cd ${FLOW_PATH}
+            cd ${FlOW_APP_NAME}
+            cp -rf dist/flow-api-*.war ${FLOW_RUN_PATH}/flow-api.war
+            cp -rf dist/flow-control-center-*.war  ${FLOW_RUN_PATH}/flow-control-center.war
+            echo "Start APACHE-TOMCAT...."
+            sh ${APACHE_TOMCAT_HOME}/bin/startup.sh
+            echo "APACHE-TOMCAT start success"
+      - name: Auto Test
+        isFinal: true
+        script: |-
+            curl -I ${PROJECT_URL}
+            curl -X POST "http://${PROJECT_URL}:8080/flow-api/user/login" -H "accept: */*" -H "Content-Type: application/json" -d "{ \"emailOrUsername\": \"admin\", \"password\": \"123456\"}"
+      - name: Docker Build
+        isFinal: true
+        script: |-
+            cd ${FLOW_PATH}/${FlOW_APP_NAME}
+            docker build -t plat .
+            docker tag plat registry.cn-shanghai.aliyuncs.com/devnavi/platform:latest
+            docker push registry.cn-shanghai.aliyuncs.com/devnavi/platform:latest
