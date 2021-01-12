@@ -148,21 +148,28 @@ flow:
             chown -R oracle:oinstall  /u01/app/oracle/*
       - name: 启动源数据库
         script: |
-            echo 刷新目标数据库文件权限
+            echo 启动源数据库
+            echo "源环境数据库IP:${ORI_ENV_DB_JG}"
             ssh root@${ORI_ENV_DB_JG} "su - oracle -s /bin/bash /home/h3c_file/DB_start.sh"
       - name: 启动目标数据库
         script: |
+            echo 启动目标数据库
+            echo "目标环境数据库IP:${DES_ENV_DB_JG}"
             ssh root@${DES_ENV_DB_JG} "su - oracle -s /bin/bash /home/h3c_file/DB_start.sh"
       - name: 检查数据库
         script: |
-            echo ------------监听检查---------------------
+            echo ------------目标监听检查---------------------
+            echo "目标环境数据库IP:${DES_ENV_DB_JG}"
             ssh root@${DES_ENV_DB_JG} "su - oracle -s /bin/bash /home/h3c_file/DB_check.sh"
       - name: 阶段后启动源数据库
         isFinal: true
         script: |
+            echo 启动源数据库
+            echo "源环境数据库IP:${ORI_ENV_DB_JG}"
             ssh root@${ORI_ENV_DB_JG} "su - oracle -s /bin/bash /home/h3c_file/DB_start.sh"
       - name: 阶段后检查源数据库
         isFinal: true
         script: |
             echo ------------源数据库监听检查---------------------
+            echo "源环境数据库IP:${ORI_ENV_DB_JG}"
             ssh root@${ORI_ENV_DB_JG} "su - oracle -s /bin/bash /home/h3c_file/DB_check.sh"
