@@ -1,0 +1,33 @@
+
+免密：
+ssh-copy-id -i .ssh/id_rsa.pub root@192.25.109.236
+
+192.25.109.237
+---------
+中间件改：nrs.xml中as和lsip
+还得改AS.xml中udp_ip
+192.25.105.255--->as ip    只改as
+
+中间件和数据库通信，需要使用
+/u01/app/oracle/product/11.2.0/db/network/admin/tnsnames.ora
+
+
+mkdir -p $(date +%F)
+cp *.xml $(date +%F)
+sed -i  "s/192.25.105.131/192.25.109.236/g"  nrs.xml
+sed -i  "s/192.25.105.132/192.25.109.237/g"  nrs.xml
+
+
+AS*替换
+sed -i  "s/192.25.105.255/192.25.109.236/g"  /u01/app/oracle/product/11.2.0/db/network/admin/tnsnames.ora
+
+
+
+数据库：
+/u01/app/oracle/product/11.2.0/db_1/network/admin/tnsnames.ora
+/u01/app/oracle/product/11.2.0/db_1/network/admin/listener.ora
+/u01/app/oracle/product/11.2.0/db_1/network/admin/sqlnet.ora  
+/etc/hosts   
+/etc/sysconfig/network 
+
+sed -i  "s/192.25.105.130/192.25.109.238/g"  *.ora
