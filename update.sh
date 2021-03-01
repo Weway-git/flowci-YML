@@ -1,36 +1,37 @@
 echo "============================================"
-echo "Éý¼¶Ç°¶Ë"
+echo "ï¿½ï¿½ï¿½ï¿½Ç°ï¿½ï¿½"
 echo "============================================"
-echo "±¸·ÝºÍÇå¿ÕÎÄ¼þ"
+echo "ï¿½ï¿½ï¿½Ýºï¿½ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½"
 date1=$(date +%F)
 mkdir -p backup/$date1
 tar -cvf backup/$date1/webdist.tar /usr/share/nginx/html/*
 rm -rf /usr/share/nginx/html/*
-echo "²¿Êð"
+echo "ï¿½ï¿½ï¿½ï¿½"
 tar -xvf /h3c/update/Prepare/web* -C /usr/share/nginx/html/
 cd /usr/share/nginx/html/
-echo "ÅäÖÃÌæ»»"
+echo "ï¿½ï¿½ï¿½ï¿½ï¿½æ»»"
 sed -i '/^.*end.*flow-api"$/c  $endPoint: "http://192.25.106.220:8081/flow-api"' index.html
 # sed -i "s/^.*endPoint: \"http.*$/      \$endPoint: \"http:\/\/192.25.106.220:8081\/flow-api\"/"  index.html
 cat index.html
-echo "ÖØÆô"
+echo "ï¿½ï¿½ï¿½ï¿½"
 nginx -s reload
 
 
 echo "============================================"
-echo "Éý¼¶ºóÌ¨"
+echo "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ì¨"
 echo "============================================"
 echo "Í£Ö¹tomcat"
-sh /h3c/apache-tomcat-8.5.51/bin/shutdown.sh
-sleep 15
+# sh /h3c/apache-tomcat-8.5.51/bin/shutdown.sh
+# sleep 15
+ps -ef | grep -v grep | grep tomcat  | awk '{print $2}' | xargs kill -9
 ps aux |grep tomcat
-echo "±¸·ÝºÍÇå¿ÕÎÄ¼þ"
+echo "ï¿½ï¿½ï¿½Ýºï¿½ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½"
 cp /h3c/apache-tomcat-8.5.51/webapps/flow*.war backup/$date1/
 rm -rf /h3c/apache-tomcat-8.5.51/webapps/flow*
-echo "ÎÄ¼þÉý¼¶"
+echo "ï¿½Ä¼ï¿½ï¿½ï¿½ï¿½ï¿½"
 cp -rf /h3c/update/Prepare/flow* /h3c/apache-tomcat-8.5.51/webapps/
 ls /h3c/apache-tomcat-8.5.51/webapps/
-echo "Æô¶¯tomcat"
+echo "ï¿½ï¿½ï¿½ï¿½tomcat"
 export FLOW_API_CONFIG_PATH="/h3c/app-api.properties"
 export FLOW_CC_CONFIG_PATH="/h3c/app-cc.properties"
 sh /h3c/apache-tomcat-8.5.51/bin/startup.sh
