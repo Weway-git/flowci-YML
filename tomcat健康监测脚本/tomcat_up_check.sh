@@ -4,5 +4,5 @@ if [ $? -ne 0 ]
     echo "tomcat not run"
 else
     echo "tomcat is running"
-    sh /usr/local/apache-tomcat-9.0.24/bin/shutdown.sh
+    ps -ef | grep -v grep | grep tomcat  | awk '{print $2}' | xargs kill -9
 fi
